@@ -205,7 +205,7 @@ def build_fig_1d(data, mu0, sigma0):
         height=420, showlegend=True, plot_bgcolor="white",
         margin=dict(l=10, r=10, t=30, b=10),
         xaxis=dict(range=[-6, 11], title="x"),
-        yaxis=dict(title="density"),
+        yaxis=dict(range=[0, 0.65], title="density"),  # fixed so extreme prior spikes don't squash the data
         legend=dict(orientation="h", yanchor="bottom", y=1.0, x=0),
     )
     return fig, post_mu, post_sd
@@ -221,8 +221,8 @@ def draw_tab_1d():
     c1, c2 = st.columns(2)
     mu0 = c1.slider("Stage 1 · prior mean μ₀", -3.0, 7.0, MU0_DEFAULT, 0.1,
                     help="Coarse localization: the posterior is pulled toward μ₀.")
-    sigma0 = c2.slider("Stage 2 · prior σ₀", 0.2, 4.0, SIGMA0_DEFAULT, 0.05,
-                       help="Envelope tuning: wide σ₀ → data dominate; narrow σ₀ → prior dominates.")
+    sigma0 = c2.slider("Stage 2 · prior σ₀", 0.1, 6.0, SIGMA0_DEFAULT, 0.1,
+                       help="Envelope tuning: data σ=2. σ₀ ≫ 2 → prior is flat, data dominate; σ₀ ≪ 2 → prior spikes and dominates.")
 
     @st.cache_data
     def gen_data_1d(seed, n):
@@ -254,11 +254,11 @@ def draw_tab_1d():
             f.update_layout(title=f"stage 1 — sliding μ₀ = {m:.2f}")
             holder.plotly_chart(f, width="stretch", key=f"mu_{m:.3f}")
             time.sleep(0.1)
-        for s in np.linspace(SIGMA0_DEFAULT, 0.4, 15):     # stage 2: tighten envelope
+        for s in np.linspace(5.0, 0.3, 24):  # stage 2: full envelope sweep, wide -> narrow
             f, _, _ = build_fig_1d(data, 3.0, s)
-            f.update_layout(title=f"stage 2 — tightening σ₀ = {s:.2f}")
+            f.update_layout(title=f"stage 2 — envelope σ₀ = {s:.2f}")
             holder.plotly_chart(f, width="stretch", key=f"sg_{s:.3f}")
-            time.sleep(0.1)
+            time.sleep(0.08)
 
 # ======================================================================
 # Layout: tab-like switcher (segmented control keeps hidden views from
