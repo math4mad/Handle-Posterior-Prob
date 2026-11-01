@@ -27,6 +27,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
+from knobjs import rotary_knob
+
 st.set_page_config(page_title="Posterior Knob", layout="wide")
 
 # ----------------------------------------------------------------------
@@ -219,10 +221,14 @@ def draw_tab_1d():
         "data dominate, a narrow prior pins the posterior near μ₀."
     )
     c1, c2 = st.columns(2)
-    mu0 = c1.slider("Stage 1 · prior mean μ₀", -3.0, 7.0, MU0_DEFAULT, 0.1,
-                    help="Coarse localization: the posterior is pulled toward μ₀.")
-    sigma0 = c2.slider("Stage 2 · prior σ₀", 0.1, 6.0, SIGMA0_DEFAULT, 0.1,
-                       help="Envelope tuning: data σ=2. σ₀ ≫ 2 → prior is flat, data dominate; σ₀ ≪ 2 → prior spikes and dominates.")
+    with c1:
+        mu0 = rotary_knob("Stage 1 · prior mean μ₀", -3.0, 7.0, MU0_DEFAULT, 0.1, key="mu0")
+    with c2:
+        sigma0 = rotary_knob("Stage 2 · prior σ₀", 0.1, 6.0, SIGMA0_DEFAULT, 0.1, key="sigma0")
+    st.caption(
+        "Knobs: drag to spin, slide vertically/horizontally like a fader, or scroll "
+        "with the mouse wheel. (Gesture engine: [Knob.js](https://github.com/jherrm/knobs).)"
+    )
 
     @st.cache_data
     def gen_data_1d(seed, n):
