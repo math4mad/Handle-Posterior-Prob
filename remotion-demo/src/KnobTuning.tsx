@@ -23,7 +23,9 @@ const gauss = (x: number, mu: number, sigma: number) =>
 const mapX = (x: number, w: number) =>
   60 + ((x - X_MIN) / (X_MAX - X_MIN)) * (w - 120);
 const SVG_H = 340; // chart svg height (height - 200)
-const mapY = (y: number) => SVG_H - 30 - (y / 0.7) * (SVG_H - 60);
+// y scale covers up to density 1.05 — σ=0.4 peaks at ≈1.0, so nothing clips
+const Y_MAX_DENSITY = 1.05;
+const mapY = (y: number) => SVG_H - 30 - (y / Y_MAX_DENSITY) * (SVG_H - 60);
 
 export const KnobTuning: React.FC = () => {
   const frame = useCurrentFrame();
