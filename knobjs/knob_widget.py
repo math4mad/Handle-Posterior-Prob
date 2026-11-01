@@ -130,7 +130,23 @@ export default function (component) {
       const v = parseFloat(k.element.value);
       valueEl.textContent = v.toFixed(data.decimals);
       drawFill(v);
-      if (!state.hydrating) setStateValue("value", v);
+      // Throttle state pushes: coalesce to animation frames and only send
+      // when the step-rounded value actually changed. Without this, every
+      // intermediate angle triggers a full-app Streamlit rerun and the page
+      // visibly jitters while tuning.
+      if (state.hydrating) return;
+      const q = Math.round(v / data.step) * data.step;
+      state.pendingValue = q;
+      if (!state.rafPending) {
+        state.rafPending = true;
+        requestAnimationFrame(() => {
+          state.rafPending = false;
+          if (state.pendingValue !== state.lastSent) {
+            state.lastSent = state.pendingValue;
+            setStateValue("value", state.pendingValue);
+          }
+        });
+      }
     });
     dial.__knob = knob;
 

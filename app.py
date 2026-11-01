@@ -212,6 +212,7 @@ def build_fig_1d(data, mu0, sigma0):
     )
     return fig, post_mu, post_sd
 
+@st.fragment
 def draw_tab_1d():
     st.markdown(
         "**Two-stage knob** — data come from $\\mathcal{N}(\\mu{=}3,\\ \\sigma{=}2)$, "
