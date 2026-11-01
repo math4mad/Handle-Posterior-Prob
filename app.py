@@ -21,6 +21,7 @@ Run:  streamlit run app.py
 """
 
 import time
+from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
@@ -29,7 +30,48 @@ import streamlit as st
 
 from knobjs import rotary_knob
 
-st.set_page_config(page_title="Posterior Knob", layout="wide")
+st.set_page_config(
+    page_title="Posterior Knob — Posterior Cockpit",
+    page_icon="🎛️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ======================================================================
+# Landing page (hero) — shown once, dismissible
+# ======================================================================
+HERO_VIDEO = Path(__file__).parent / "remotion-demo" / "out" / "knob_tuning.mp4"
+
+if "landing_seen" not in st.session_state:
+    st.session_state.landing_seen = False
+
+if not st.session_state.landing_seen:
+    st.markdown(
+        """
+        <div style="text-align:center; padding: 28px 0 6px;">
+          <h1 style="font-weight:800; margin:0;">🎛️ Posterior Knob</h1>
+          <p style="font-size:1.15rem; opacity:0.8; max-width:720px; margin:10px auto;">
+            Turn posterior probabilities like a knob — adjust a model's
+            sensitivity to data with GarageBand-style rotary controls.
+            Bayesian inference for the 1-D and 2-D Gaussian, made tangible.
+          </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if HERO_VIDEO.exists():
+        st.video(str(HERO_VIDEO), autoplay=True, muted=True, loop=True)
+    st.markdown(" ")  # spacer
+    if st.button(
+        "🚀 Launch the Cockpit", type="primary", use_container_width=True
+    ):
+        st.session_state.landing_seen = True
+        st.rerun()
+    st.caption(
+        "Hero animation rendered with Remotion · knobs powered by "
+        "[Knob.js](https://github.com/jherrm/knobs) · Murphy (2022) Fig 3.9"
+    )
+    st.stop()  # landing only; interactive app loads after the click
 
 # ----------------------------------------------------------------------
 # Shared sidebar
